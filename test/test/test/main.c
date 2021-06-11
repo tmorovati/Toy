@@ -10,11 +10,17 @@
 
 int main(void)
 {
-    /* Replace with your application code */
-    while (1) 
-    {
-		
-		return ; 
-    }
+	unsigned char z ; 	
+	DDRB = 0xFF ; //PORTB is output	
+	DDRA = 0x0F ; 
+	for (z = 0 ; z<= 5 ; z++ )
+	{
+		PORTB = z ; 
+		PORTA = 0x01 ; 
+		//PORTA = 0b00000011 ; 
+		//PORTA = 0b00000101 ; 
+		//PORTA = 0b00000110 ; 
+	}
+	return 0 ; 
 }
 
