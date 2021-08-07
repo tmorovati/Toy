@@ -1,0 +1,11 @@
+//play back first track command 
+#define START_BYTE 0x7E
+#define VERSION    0xFF
+#define LENGTH     0x06
+#define COMMAND    0x03
+#define FEEDBACK   0x00
+#define PARAM_MSB  0x00
+#define PARAM_LSB  0x01
+#define CHECK_MSB  0xFE
+#define CHECK_LSB  0xF7
+#define END_BYTE   0xEF
