@@ -1,0 +1,65 @@
+//play back first track command 
+#define START_BYTE 0x7E
+#define VERSION_BYTE    0xFF
+#define LENGTH_BYTE     0x06
+#define FDBACK_BYTE   0x00
+#define NO_FDBACK_BYTE       0x00
+#define END_BYTE   0xEF
+//
+
+
+
+//USART-interrupt config 
+#define DATA_REGISTER_EMPTY (1<<UDRE)
+#define RX_COMPLETE (1<<RXC)
+#define FRAMING_ERROR (1<<FE)
+#define PARITY_ERROR (1<<UPE)
+#define DATA_OVERRUN (1<<DOR)
+//
+
+
+//buffer size 
+#define MAX_USART_BUFFER_SIZE 32 
+//
+
+
+//take_query function 
+enum
+{
+    STARTING ,
+    VERSION ,
+    LENGTH ,
+    QUERY ,
+    FEEDBACK ,
+    PARAM_MSB ,
+    PARAM_LSB ,
+    CHCK_MSB , 
+    CHCK_LSB ,
+    ENDING
+};
+//
+
+enum
+{
+    NOT_READY , 
+    READY
+}; 
+//
+
+
+//
+enum
+{
+    EMPTY ,
+    FULL
+};
+//
+
+//Returned data from modul
+/********Query ******/
+#define ONLINE_EQUIPMENT 0x3F //after modul is power_on
+/********which_equipment******/
+#define USB_ONLINE 0x0001
+#define SD_ONLINE  0x0002
+#define USB_SD     0x0003
+#define PC         0x0004

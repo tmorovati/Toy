@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.30  D:\My Documents\final project for bachelor\TOY\cloned\Toy\phase-0\Debug\List\phase0.asm Fri Aug 06 00:02:53 2021
+AVRASM ver. 2.1.30  D:\My Documents\final project for bachelor\TOY\cloned\Toy\phase-0\Debug\List\phase0.asm Tue Aug 10 06:54:51 2021
 
                  
                  
@@ -1175,7 +1175,7 @@ AVRASM ver. 2.1.30  D:\My Documents\final project for bachelor\TOY\cloned\Toy\ph
 00004f e6c0      	LDI  R28,LOW(__SRAM_START+__DSTACK_SIZE)
 000050 e0d2      	LDI  R29,HIGH(__SRAM_START+__DSTACK_SIZE)
                  
-000051 940c 008f 	JMP  _main
+000051 940c 0090 	JMP  _main
                  
                  	.ESEG
                  	.ORG 0
@@ -1209,7 +1209,7 @@ AVRASM ver. 2.1.30  D:\My Documents\final project for bachelor\TOY\cloned\Toy\ph
                  ; 0000 0008 
                  ; 0000 0009      char i=0 ;
                  ; 0000 000A      char send_command[10]= {START_BYTE, VERSION, LENGTH, 0, FEEDBACK, 0, 0, 0, 0, END_BYTE} ;
-                 ; 0000 000B      int checksum = (0xFFFF - (VERSION + LENGTH + command + FEEDBACK + param )) ;
+                 ; 0000 000B      int checksum = ((0xFFFF - (VERSION + LENGTH + command + FEEDBACK + param )) + 1 )  ;
                  ; 0000 000C      send_command[3] =  command ;
 000053 93ba      	ST   -Y,R27
 000054 93aa      	ST   -Y,R26
@@ -1219,8 +1219,8 @@ AVRASM ver. 2.1.30  D:\My Documents\final project for bachelor\TOY\cloned\Toy\ph
 000058 e0b0      	LDI  R27,HIGH(0)
 000059 e6e6      	LDI  R30,LOW(_0x3*2)
 00005a e0f0      	LDI  R31,HIGH(_0x3*2)
-00005b 940e 00cb 	CALL __INITLOCB
-00005d 940e 00c1 	CALL __SAVELOCR4
+00005b 940e 00cc 	CALL __INITLOCB
+00005d 940e 00c2 	CALL __SAVELOCR4
                  ;	command -> Y+16
                  ;	param -> Y+14
                  ;	i -> R17
@@ -1237,101 +1237,103 @@ AVRASM ver. 2.1.30  D:\My Documents\final project for bachelor\TOY\cloned\Toy\ph
 000067 1ffb      	ADC  R31,R27
 000068 efaf      	LDI  R26,LOW(65535)
 000069 efbf      	LDI  R27,HIGH(65535)
-00006a 940e 00ba 	CALL __SWAPW12
+00006a 940e 00bb 	CALL __SWAPW12
 00006c 1bea      	SUB  R30,R26
 00006d 0bfb      	SBC  R31,R27
-00006e 019f      	MOVW R18,R30
-00006f 89e8      	LDD  R30,Y+16
-000070 83ef      	STD  Y+7,R30
+00006e 9631      	ADIW R30,1
+00006f 019f      	MOVW R18,R30
+000070 89e8      	LDD  R30,Y+16
+000071 83ef      	STD  Y+7,R30
                  ; 0000 000D      send_command[5] =  (( param >> 8 )& 0xFF )  ;
-000071 85ee      	LDD  R30,Y+14
-000072 85ff      	LDD  R31,Y+14+1
-000073 940e 00b5 	CALL __ASRW8
-000075 87e9      	STD  Y+9,R30
+000072 85ee      	LDD  R30,Y+14
+000073 85ff      	LDD  R31,Y+14+1
+000074 940e 00b6 	CALL __ASRW8
+000076 87e9      	STD  Y+9,R30
                  ; 0000 000E      send_command[6] =  ( param &  0xFF );
-000076 85ee      	LDD  R30,Y+14
-000077 87ea      	STD  Y+10,R30
+000077 85ee      	LDD  R30,Y+14
+000078 87ea      	STD  Y+10,R30
                  ; 0000 000F      send_command[7] =  (( checksum >> 8 )& 0xFF )  ;
-000078 01f9      	MOVW R30,R18
-000079 940e 00b5 	CALL __ASRW8
-00007b 87eb      	STD  Y+11,R30
+000079 01f9      	MOVW R30,R18
+00007a 940e 00b6 	CALL __ASRW8
+00007c 87eb      	STD  Y+11,R30
                  ; 0000 0010      send_command[8] =  ( checksum &  0xFF );
-00007c 2fe2      	MOV  R30,R18
-00007d 87ec      	STD  Y+12,R30
+00007d 2fe2      	MOV  R30,R18
+00007e 87ec      	STD  Y+12,R30
                  ; 0000 0011 
                  ; 0000 0012      for(i ; i < 10 ; i++ )
-00007e 2fe1      	MOV  R30,R17
+00007f 2fe1      	MOV  R30,R17
                  _0x5:
-00007f 301a      	CPI  R17,10
-000080 f450      	BRSH _0x6
+000080 301a      	CPI  R17,10
+000081 f450      	BRSH _0x6
                  ; 0000 0013          putchar(send_command[i]);
-000081 2fe1      	MOV  R30,R17
-000082 e0f0      	LDI  R31,0
-000083 01de      	MOVW R26,R28
-000084 9614      	ADIW R26,4
-000085 0fae      	ADD  R26,R30
-000086 1fbf      	ADC  R27,R31
-000087 91ac      	LD   R26,X
-000088 d01b      	RCALL _putchar
-000089 5f1f      	SUBI R17,-1
-00008a cff4      	RJMP _0x5
+000082 2fe1      	MOV  R30,R17
+000083 e0f0      	LDI  R31,0
+000084 01de      	MOVW R26,R28
+000085 9614      	ADIW R26,4
+000086 0fae      	ADD  R26,R30
+000087 1fbf      	ADC  R27,R31
+000088 91ac      	LD   R26,X
+000089 d01b      	RCALL _putchar
+00008a 5f1f      	SUBI R17,-1
+00008b cff4      	RJMP _0x5
                  _0x6:
                  ; 0000 0014 }
-00008b 940e 00c6 	CALL __LOADLOCR4
-00008d 9661      	ADIW R28,17
-00008e 9508      	RET
+00008c 940e 00c7 	CALL __LOADLOCR4
+00008e 9661      	ADIW R28,17
+00008f 9508      	RET
                  ; .FEND
                  ;//int take_query()
+                 ;//{
+                 ;//    char take_query[10]= {START_BYTE, VERSION, LENGTH, }
+                 ;//}
                  ;void main(void)
-                 ; 0000 0017 {
+                 ; 0000 001A {
                  _main:
                  ; .FSTART _main
-                 ; 0000 0018 
-                 ; 0000 0019 
-                 ; 0000 001A // USART initialization
-                 ; 0000 001B // Communication Parameters: 8 Data, 1 Stop, No Parity
-                 ; 0000 001C // USART Receiver: Off
-                 ; 0000 001D // USART Transmitter: On
-                 ; 0000 001E // USART Mode: Asynchronous
-                 ; 0000 001F // USART Baud Rate: 9600
-                 ; 0000 0020 UCSRA=(0<<RXC) | (0<<TXC) | (0<<UDRE) | (0<<FE) | (0<<DOR) | (0<<UPE) | (0<<U2X) | (0<<MPCM);
-00008f e0e0      	LDI  R30,LOW(0)
-000090 b9eb      	OUT  0xB,R30
-                 ; 0000 0021 UCSRB=(0<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (0<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
-000091 e0e8      	LDI  R30,LOW(8)
-000092 b9ea      	OUT  0xA,R30
-                 ; 0000 0022 UCSRC=(1<<URSEL) | (0<<UMSEL) | (0<<UPM1) | (0<<UPM0) | (0<<USBS) | (1<<UCSZ1) | (1<<UCSZ0) | (0<<UCPOL);
-000093 e8e6      	LDI  R30,LOW(134)
-000094 bde0      	OUT  0x20,R30
-                 ; 0000 0023 UBRRH=0x00;
-000095 e0e0      	LDI  R30,LOW(0)
-000096 bde0      	OUT  0x20,R30
-                 ; 0000 0024 UBRRL=0x33;
-000097 e3e3      	LDI  R30,LOW(51)
-000098 b9e9      	OUT  0x9,R30
-                 ; 0000 0025           delay_ms(5000);
-000099 e8a8      	LDI  R26,LOW(5000)
-00009a e1b3      	LDI  R27,HIGH(5000)
-00009b 940e 00ab 	CALL _delay_ms
-                 ; 0000 0026           send_command(0x03 , 0x0001);
-00009d e0e3      	LDI  R30,LOW(3)
-00009e 93ea      	ST   -Y,R30
-00009f e0a1      	LDI  R26,LOW(1)
-0000a0 e0b0      	LDI  R27,0
-0000a1 dfb1      	RCALL _send_command
-                 ; 0000 0027 
-                 ; 0000 0028 
-                 ; 0000 0029     while (1)
-                 _0x7:
-                 ; 0000 002A           {
+                 ; 0000 001B 
+                 ; 0000 001C 
+                 ; 0000 001D // USART initialization
+                 ; 0000 001E // Communication Parameters: 8 Data, 1 Stop, No Parity
+                 ; 0000 001F // USART Receiver: Off
+                 ; 0000 0020 // USART Transmitter: On
+                 ; 0000 0021 // USART Mode: Asynchronous
+                 ; 0000 0022 // USART Baud Rate: 9600
+                 ; 0000 0023 UCSRA=(0<<RXC) | (0<<TXC) | (0<<UDRE) | (0<<FE) | (0<<DOR) | (0<<UPE) | (0<<U2X) | (0<<MPCM);
+000090 e0e0      	LDI  R30,LOW(0)
+000091 b9eb      	OUT  0xB,R30
+                 ; 0000 0024 UCSRB=(0<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (0<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
+000092 e0e8      	LDI  R30,LOW(8)
+000093 b9ea      	OUT  0xA,R30
+                 ; 0000 0025 UCSRC=(1<<URSEL) | (0<<UMSEL) | (0<<UPM1) | (0<<UPM0) | (0<<USBS) | (1<<UCSZ1) | (1<<UCSZ0) | (0<<UCPOL);
+000094 e8e6      	LDI  R30,LOW(134)
+000095 bde0      	OUT  0x20,R30
+                 ; 0000 0026 UBRRH=0x00;
+000096 e0e0      	LDI  R30,LOW(0)
+000097 bde0      	OUT  0x20,R30
+                 ; 0000 0027 UBRRL=0x33;
+000098 e3e3      	LDI  R30,LOW(51)
+000099 b9e9      	OUT  0x9,R30
+                 ; 0000 0028           delay_ms(5000);
+00009a e8a8      	LDI  R26,LOW(5000)
+00009b e1b3      	LDI  R27,HIGH(5000)
+00009c 940e 00ac 	CALL _delay_ms
+                 ; 0000 0029           send_command(0x03 , 0x0001);
+00009e e0e3      	LDI  R30,LOW(3)
+00009f 93ea      	ST   -Y,R30
+0000a0 e0a1      	LDI  R26,LOW(1)
+0000a1 e0b0      	LDI  R27,0
+0000a2 dfb0      	RCALL _send_command
+                 ; 0000 002A 
                  ; 0000 002B 
-                 ; 0000 002C 
-                 ; 0000 002D           }
-0000a2 cfff      	RJMP _0x7
-                 ; 0000 002E 
-                 ; 0000 002F }
+                 ; 0000 002C     while (1)
+                 _0x7:
+                 ; 0000 002D           {
+                 ; 0000 002E           }
+0000a3 cfff      	RJMP _0x7
+                 ; 0000 002F 
+                 ; 0000 0030 }
                  _0xA:
-0000a3 cfff      	RJMP _0xA
+0000a4 cfff      	RJMP _0xA
                  ; .FEND
                  	#ifndef __SLEEP_DEFINED__
                  	#endif
@@ -1339,14 +1341,14 @@ AVRASM ver. 2.1.30  D:\My Documents\final project for bachelor\TOY\cloned\Toy\ph
                  	.CSEG
                  _putchar:
                  ; .FSTART _putchar
-0000a4 93aa      	ST   -Y,R26
+0000a5 93aa      	ST   -Y,R26
                  putchar0:
-0000a5 9b5d           sbis usr,udre
-0000a6 cffe           rjmp putchar0
-0000a7 81e8           ld   r30,y
-0000a8 b9ec           out  udr,r30
-0000a9 9621      	ADIW R28,1
-0000aa 9508      	RET
+0000a6 9b5d           sbis usr,udre
+0000a7 cffe           rjmp putchar0
+0000a8 81e8           ld   r30,y
+0000a9 b9ec           out  udr,r30
+0000aa 9621      	ADIW R28,1
+0000ab 9508      	RET
                  ; .FEND
                  
                  	.CSEG
@@ -1357,68 +1359,68 @@ AVRASM ver. 2.1.30  D:\My Documents\final project for bachelor\TOY\cloned\Toy\ph
                  
                  	.CSEG
                  _delay_ms:
-0000ab 9610      	adiw r26,0
-0000ac f039      	breq __delay_ms1
+0000ac 9610      	adiw r26,0
+0000ad f039      	breq __delay_ms1
                  __delay_ms0:
                 +
-0000ad ed80     +LDI R24 , LOW ( 0x7D0 )
-0000ae e097     +LDI R25 , HIGH ( 0x7D0 )
+0000ae ed80     +LDI R24 , LOW ( 0x7D0 )
+0000af e097     +LDI R25 , HIGH ( 0x7D0 )
                 +__DELAY_USW_LOOP :
-0000af 9701     +SBIW R24 , 1
-0000b0 f7f1     +BRNE __DELAY_USW_LOOP
+0000b0 9701     +SBIW R24 , 1
+0000b1 f7f1     +BRNE __DELAY_USW_LOOP
                  	__DELAY_USW 0x7D0
-0000b1 95a8      	wdr
-0000b2 9711      	sbiw r26,1
-0000b3 f7c9      	brne __delay_ms0
+0000b2 95a8      	wdr
+0000b3 9711      	sbiw r26,1
+0000b4 f7c9      	brne __delay_ms0
                  __delay_ms1:
-0000b4 9508      	ret
+0000b5 9508      	ret
                  
                  __ASRW8:
-0000b5 2fef      	MOV  R30,R31
-0000b6 27ff      	CLR  R31
-0000b7 fde7      	SBRC R30,7
-0000b8 efff      	SER  R31
-0000b9 9508      	RET
+0000b6 2fef      	MOV  R30,R31
+0000b7 27ff      	CLR  R31
+0000b8 fde7      	SBRC R30,7
+0000b9 efff      	SER  R31
+0000ba 9508      	RET
                  
                  __SWAPW12:
-0000ba 2e1b      	MOV  R1,R27
-0000bb 2fbf      	MOV  R27,R31
-0000bc 2df1      	MOV  R31,R1
+0000bb 2e1b      	MOV  R1,R27
+0000bc 2fbf      	MOV  R27,R31
+0000bd 2df1      	MOV  R31,R1
                  
                  __SWAPB12:
-0000bd 2e1a      	MOV  R1,R26
-0000be 2fae      	MOV  R26,R30
-0000bf 2de1      	MOV  R30,R1
-0000c0 9508      	RET
+0000be 2e1a      	MOV  R1,R26
+0000bf 2fae      	MOV  R26,R30
+0000c0 2de1      	MOV  R30,R1
+0000c1 9508      	RET
                  
                  __SAVELOCR4:
-0000c1 933a      	ST   -Y,R19
+0000c2 933a      	ST   -Y,R19
                  __SAVELOCR3:
-0000c2 932a      	ST   -Y,R18
+0000c3 932a      	ST   -Y,R18
                  __SAVELOCR2:
-0000c3 931a      	ST   -Y,R17
-0000c4 930a      	ST   -Y,R16
-0000c5 9508      	RET
+0000c4 931a      	ST   -Y,R17
+0000c5 930a      	ST   -Y,R16
+0000c6 9508      	RET
                  
                  __LOADLOCR4:
-0000c6 813b      	LDD  R19,Y+3
+0000c7 813b      	LDD  R19,Y+3
                  __LOADLOCR3:
-0000c7 812a      	LDD  R18,Y+2
+0000c8 812a      	LDD  R18,Y+2
                  __LOADLOCR2:
-0000c8 8119      	LDD  R17,Y+1
-0000c9 8108      	LD   R16,Y
-0000ca 9508      	RET
+0000c9 8119      	LDD  R17,Y+1
+0000ca 8108      	LD   R16,Y
+0000cb 9508      	RET
                  
                  __INITLOCB:
                  __INITLOCW:
-0000cb 0fac      	ADD  R26,R28
-0000cc 1fbd      	ADC  R27,R29
+0000cc 0fac      	ADD  R26,R28
+0000cd 1fbd      	ADC  R27,R29
                  __INITLOC0:
-0000cd 9005      	LPM  R0,Z+
-0000ce 920d      	ST   X+,R0
-0000cf 958a      	DEC  R24
-0000d0 f7e1      	BRNE __INITLOC0
-0000d1 9508      	RET
+0000ce 9005      	LPM  R0,Z+
+0000cf 920d      	ST   X+,R0
+0000d0 958a      	DEC  R24
+0000d1 f7e1      	BRNE __INITLOC0
+0000d2 9508      	RET
                  
                  ;END OF CODE MARKER
                  __END_OF_CODE:
@@ -1442,13 +1444,13 @@ ATmega32 register use summary:
 r0 :   2 r1 :   4 r2 :   0 r3 :   0 r4 :   0 r5 :   0 r6 :   0 r7 :   0 
 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:   0 r14:   0 r15:   0 
 r16:   2 r17:   7 r18:   5 r19:   2 r20:   0 r21:   0 r22:   0 r23:   0 
-r24:   8 r25:   2 r26:  20 r27:  13 r28:   6 r29:   2 r30:  47 r31:  15 
+r24:   8 r25:   2 r26:  20 r27:  13 r28:   6 r29:   2 r30:  48 r31:  15 
 x  :   4 y  :  25 z  :   1 
 Registers used: 17 out of 35 (48.6%)
 
 ATmega32 instruction use summary:
 .lds  :   0 .lds.l:   0 .sts  :   0 .sts.l:   0 adc   :   3 add   :   3 
-adiw  :   4 and   :   0 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 
+adiw  :   5 and   :   0 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 
 brbc  :   0 brbs  :   0 brcc  :   0 brcs  :   0 break :   0 breq  :   1 
 brge  :   0 brhc  :   0 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 
 brlt  :   0 brmi  :   0 brne  :   5 brpl  :   0 brsh  :   1 brtc  :   0 
@@ -1472,7 +1474,7 @@ Instructions used: 33 out of 116 (28.4%)
 ATmega32 memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x0001a4    392     28    420   32768   1.3%
+[.cseg] 0x000000 0x0001a6    394     28    422   32768   1.3%
 [.dseg] 0x000060 0x000260      0      0      0    2048   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 

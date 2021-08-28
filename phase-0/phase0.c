@@ -8,7 +8,7 @@ void send_command(char command , int param  )
      
      char i=0 ;
      char send_command[10]= {START_BYTE, VERSION, LENGTH, 0, FEEDBACK, 0, 0, 0, 0, END_BYTE} ;
-     int checksum = (0xFFFF - (VERSION + LENGTH + command + FEEDBACK + param )) ;
+     int checksum = ((0xFFFF - (VERSION + LENGTH + command + FEEDBACK + param )) + 1 )  ;
      send_command[3] =  command ; 
      send_command[5] =  (( param >> 8 )& 0xFF )  ; 
      send_command[6] =  ( param &  0xFF ); 
@@ -18,7 +18,11 @@ void send_command(char command , int param  )
      for(i ; i < 10 ; i++ )
          putchar(send_command[i]); 
 } 
-//int take_query()
+int take_query()
+{
+
+    char take_query[10]= {START_BYTE, VERSION, LENGTH, 0, FEEDBACK, 0, 0, 0, 0, END_BYTE} ; 
+}
 void main(void)
 {
     
@@ -40,8 +44,6 @@ UBRRL=0x33;
 
     while (1)
           {
-                
-
           } 
      
 }

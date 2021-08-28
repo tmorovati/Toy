@@ -1196,7 +1196,7 @@ _send_command:
 ; 0000 0008 
 ; 0000 0009      char i=0 ;
 ; 0000 000A      char send_command[10]= {START_BYTE, VERSION, LENGTH, 0, FEEDBACK, 0, 0, 0, 0, END_BYTE} ;
-; 0000 000B      int checksum = (0xFFFF - (VERSION + LENGTH + command + FEEDBACK + param )) ;
+; 0000 000B      int checksum = ((0xFFFF - (VERSION + LENGTH + command + FEEDBACK + param )) + 1 )  ;
 ; 0000 000C      send_command[3] =  command ;
 	ST   -Y,R27
 	ST   -Y,R26
@@ -1227,6 +1227,7 @@ _send_command:
 	CALL __SWAPW12
 	SUB  R30,R26
 	SBC  R31,R27
+	ADIW R30,1
 	MOVW R18,R30
 	LDD  R30,Y+16
 	STD  Y+7,R30
@@ -1269,54 +1270,55 @@ _0x6:
 	RET
 ; .FEND
 ;//int take_query()
+;//{
+;//    char take_query[10]= {START_BYTE, VERSION, LENGTH, }
+;//}
 ;void main(void)
-; 0000 0017 {
+; 0000 001A {
 _main:
 ; .FSTART _main
-; 0000 0018 
-; 0000 0019 
-; 0000 001A // USART initialization
-; 0000 001B // Communication Parameters: 8 Data, 1 Stop, No Parity
-; 0000 001C // USART Receiver: Off
-; 0000 001D // USART Transmitter: On
-; 0000 001E // USART Mode: Asynchronous
-; 0000 001F // USART Baud Rate: 9600
-; 0000 0020 UCSRA=(0<<RXC) | (0<<TXC) | (0<<UDRE) | (0<<FE) | (0<<DOR) | (0<<UPE) | (0<<U2X) | (0<<MPCM);
+; 0000 001B 
+; 0000 001C 
+; 0000 001D // USART initialization
+; 0000 001E // Communication Parameters: 8 Data, 1 Stop, No Parity
+; 0000 001F // USART Receiver: Off
+; 0000 0020 // USART Transmitter: On
+; 0000 0021 // USART Mode: Asynchronous
+; 0000 0022 // USART Baud Rate: 9600
+; 0000 0023 UCSRA=(0<<RXC) | (0<<TXC) | (0<<UDRE) | (0<<FE) | (0<<DOR) | (0<<UPE) | (0<<U2X) | (0<<MPCM);
 	LDI  R30,LOW(0)
 	OUT  0xB,R30
-; 0000 0021 UCSRB=(0<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (0<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
+; 0000 0024 UCSRB=(0<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (0<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
 	LDI  R30,LOW(8)
 	OUT  0xA,R30
-; 0000 0022 UCSRC=(1<<URSEL) | (0<<UMSEL) | (0<<UPM1) | (0<<UPM0) | (0<<USBS) | (1<<UCSZ1) | (1<<UCSZ0) | (0<<UCPOL);
+; 0000 0025 UCSRC=(1<<URSEL) | (0<<UMSEL) | (0<<UPM1) | (0<<UPM0) | (0<<USBS) | (1<<UCSZ1) | (1<<UCSZ0) | (0<<UCPOL);
 	LDI  R30,LOW(134)
 	OUT  0x20,R30
-; 0000 0023 UBRRH=0x00;
+; 0000 0026 UBRRH=0x00;
 	LDI  R30,LOW(0)
 	OUT  0x20,R30
-; 0000 0024 UBRRL=0x33;
+; 0000 0027 UBRRL=0x33;
 	LDI  R30,LOW(51)
 	OUT  0x9,R30
-; 0000 0025           delay_ms(5000);
+; 0000 0028           delay_ms(5000);
 	LDI  R26,LOW(5000)
 	LDI  R27,HIGH(5000)
 	CALL _delay_ms
-; 0000 0026           send_command(0x03 , 0x0001);
+; 0000 0029           send_command(0x03 , 0x0001);
 	LDI  R30,LOW(3)
 	ST   -Y,R30
 	LDI  R26,LOW(1)
 	LDI  R27,0
 	RCALL _send_command
-; 0000 0027 
-; 0000 0028 
-; 0000 0029     while (1)
-_0x7:
-; 0000 002A           {
+; 0000 002A 
 ; 0000 002B 
-; 0000 002C 
-; 0000 002D           }
+; 0000 002C     while (1)
+_0x7:
+; 0000 002D           {
+; 0000 002E           }
 	RJMP _0x7
-; 0000 002E 
-; 0000 002F }
+; 0000 002F 
+; 0000 0030 }
 _0xA:
 	RJMP _0xA
 ; .FEND

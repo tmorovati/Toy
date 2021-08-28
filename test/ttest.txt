@@ -1,0 +1,430 @@
+/*******************************************************
+This program was created by the
+CodeWizardAVR V3.12 Advanced
+Automatic Program Generator
+© Copyright 1998-2014 Pavel Haiduc, HP InfoTech s.r.l.
+http://www.hpinfotech.com
+
+Project :
+Version :
+Date    : 07/31/2021
+Author  :
+Company :
+Comments:
+
+
+Chip type               : ATmega32
+Program type            : Application
+AVR Core Clock frequency: 8.000000 MHz
+Memory model            : Small
+External RAM size       : 0
+Data Stack size         : 512
+*******************************************************/
+
+#include <mega32.h>
+#include <stdio.h>
+#include <delay.h>
+#include "header.h"
+
+// Declare your global variables here
+
+
+// USART Receiver buffer
+unsigned char uart_buffer[MAX_UART_BUFFER_SIZE] = {''};
+unsigned char uart_write_index = 0 , uart_read_index = 0;
+_Bool uart_status = EMPTY;
+
+// This flag is set on USART Receiver buffer overflow
+//bit rx_buffer_overflow;
+
+
+
+
+
+
+
+
+
+// USART Receiver interrupt service routine
+interrupt [USART_RXC] void usart_rx_isr(void)
+{
+char status=UCSRA,data=UDR;
+
+if ((status & (FRAMING_ERROR | PARITY_ERROR | DATA_OVERRUN))==0)
+    {         
+        uart_buffer[uart_write_index]=data;
+        //printf ("%c", uart_buffer[uart_write_index]) ;
+        printf ("%c", uart_write_index );
+        printf ("say sth") ;  
+         
+         
+         
+        if(++uart_write_index==MAX_UART_BUFFER_SIZE)
+        {
+            uart_write_index=0;
+            uart_status = FULL;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+//// Timer1 overflow interrupt service routine
+//interrupt [TIM1_OVF] void timer1_ovf_isr(void)
+//{
+//// Reinitialize Timer1 value
+//TCNT1H=0xCF2C >> 8;
+//TCNT1L=0xCF2C & 0xff;
+//// Place your code here
+//
+//}
+
+
+
+//
+// USART Transmitter interrupt service routine
+//interrupt [USART_TXC] void usart_tx_isr(void)
+//{
+//    while(!(UCSRA&(1<<UDRE))); //wait until UDR is empty
+//
+//    UDR=uart_buffer[uart_read_index ];
+//
+//    if(++uart_write_index==MAX_UART_BUFFER_SIZE)
+//    {
+//        uart_write_index=0;
+//        uart_status = FULL;
+//    }
+//
+//
+//}
+
+//#pragma used-
+//#endif
+//
+
+
+void df_command(unsigned char command , unsigned int param)
+{
+    unsigned char i=0;
+    unsigned int checksum = 0xFFFF - (VERSION_BYTE+LENGTH_BYTE+command+NO_FD_BYTE+((param>>8)& 0xFF )+(param & 0xFF ))+1;
+    unsigned char df_format[10]={START_BYTE,VERSION_BYTE,LENGTH_BYTE,0,NO_FD_BYTE,0,0,0,0,END_BYTE};
+    df_format[3]=command;
+    df_format[5]=(param>>8)& 0xFF;
+    df_format[6]=param & 0xFF;
+    df_format[7]=(checksum>>8)&0xFF;
+    df_format[8]=checksum & 0xFF;
+
+     for(i;i<10;i++)
+        putchar(df_format[i]);
+
+
+}
+
+unsigned char df_query(void)
+{
+    unsigned char df_phase=STARTING;
+    unsigned char status;
+    unsigned char df_format[10]={START_BYTE,VERSION_BYTE,LENGTH_BYTE,0,NO_FD_BYTE,0,0,0,0,END_BYTE};
+    unsigned char query=0;
+    unsigned int param=0;                            
+    
+    
+    
+    if((uart_read_index < uart_write_index)|(uart_status == FULL))
+    {    
+        //printf("\r\noskoljoon");    
+        switch(df_phase)
+        {
+            case STARTING :
+            
+
+//                    printf ("\n"); 
+//                    printf("%c" , uart_buffer[uart_read_index] );
+//                    printf("\npishtekooli"); 
+//                    printf("%c" , df_format[df_phase] );
+//                    printf("\n");
+//                    printf("tamom shod");    
+                  
+                //az inja dorost kar nemikone 
+                if(uart_buffer[uart_read_index] == df_format[df_phase])
+                {    
+                    //printf("hoy") ; 
+                    #ifdef DEBUG1
+                        printf("\r\nHEkhkhkhLLO");
+                    #endif
+                     df_phase++;
+                }
+
+
+                break;
+            case VERSION :
+                if(uart_buffer[uart_read_index] == df_format[df_phase])
+                {
+                    #ifdef DEBUG2
+                        printf("\r\nHELLO");
+                    #endif
+                     df_phase++;
+                }
+                break;
+            case LENGTH :
+                if(uart_buffer[uart_read_index] == df_format[df_phase])
+                {
+                    #ifdef DEBUG3
+                        printf("\r\nHELLO");
+                    #endif
+                     df_phase++;
+                }
+                break;
+            case QUERY :
+                query=uart_buffer[uart_read_index];
+                #ifdef DEBUG4
+                    printf("%c",query);
+                #endif
+                df_phase++;
+                break;
+            case FD_BACK :
+//                if(uart_buffer[uart_read_index] == df_format[df_phase])
+                    df_phase++;
+                break;
+            case PARAM_MSB :
+                param=uart_buffer[uart_read_index];
+                param=(param<<8)&(0xFF00);
+                #ifdef DEBUG5
+                    printf("%u",param);
+                #endif
+                df_phase++;
+                break;
+                //
+            case PARAM_LSB :
+                param=param | uart_buffer[uart_read_index];
+                #ifdef DEBUG6
+                    printf("%u",param);
+                #endif
+                df_phase++;
+                break;
+                //
+            case CHECK_MSB :
+//                unsigned int checksum = 0xFFFF - (VERSION_BYTE+LENGTH_BYTE+query+NO_FD_BYTE+((param>>8)& 0xFF )+(param & 0xFF ))+1;
+//                unsigned char check_msb=(checksum>>8)&0xFF;
+//                if(check_msb == uart_buffer[uart_read_index])
+                    #ifdef DEBUG7
+                        printf("\r\nHELLO");
+                    #endif
+                    df_phase++;
+                break;
+            case CHECK_LSB :
+//                if((checksum & 0xFF)==uart_buffer[uart_read_index])
+                 #ifdef DEBUG8
+                        printf("\r\nHELLO");
+                 #endif
+                df_phase++;
+                break;
+            case ENDING:
+                 #ifdef DEBUG9
+                        printf("\r\nHELLO");
+                 #endif
+                 if(uart_buffer[uart_read_index] == df_format[df_phase])
+                 {
+                    switch(query)
+                    {
+                        case ONLINE_EQUIPMENT :
+                            switch(param)
+                            {
+                                case(USB_ONLINE|SD_ONLINE|USB_SD|PC):
+                                    status=READY;
+                                    break;
+
+                            }
+
+                             break;
+//                        case():
+//                            break;
+//                        case():
+//                            break;
+//                        case():
+//                            break;
+//                        case():
+//                            break;
+
+                    }
+
+                    df_phase=STARTING;
+                 }
+                break;
+        }
+
+          if(++uart_read_index == MAX_UART_BUFFER_SIZE)
+            {
+                uart_read_index = 0;
+                uart_status = EMPTY;
+            }
+
+
+    }
+ return status;
+}
+
+//unsigned char 
+//(unsigned char query,unsigned int param)
+//{
+//    unsigned char df_phase=STARTING;
+//    unsigned char status=NOT_READY;
+//    unsigned int checksum = 0xFFFF - (VERSION_BYTE+LENGTH_BYTE+query+NO_FD_BYTE+((param>>8)& 0xFF )+(param & 0xFF ))+1;
+//    unsigned char df_format[10]={START_BYTE,VERSION_BYTE,LENGTH_BYTE,0,NO_FD_BYTE,0,0,0,0,END_BYTE};
+//    df_format[3]=query;
+//    df_format[5]=(param>>8)& 0xFF;
+//    df_format[6]=param & 0xFF;
+//    df_format[7]=(checksum>>8)&0xFF;
+//    df_format[8]=checksum & 0xFF;
+//
+//    while(uart_buffer[uart_read_index] == df_format[df_phase])
+//    {
+//        if((uart_read_index < uart_write_index))
+//        {
+//            if(++df_phase==ENDING)
+//            {
+//                df_phase=STARTING;
+//                status=READY;
+//            }
+//
+//             uart_read_index++;
+//
+//
+//        }
+//
+//
+//        else if(uart_status == FULL)
+//        {
+//             if(uart_read_index == MAX_UART_BUFFER_SIZE)
+//            {
+//                uart_read_index = 0;
+//                uart_status = EMPTY;
+//            }
+//
+//            if(++df_phase==ENDING)
+//            {
+//                df_phase=STARTING;
+//                status=READY;
+//            }
+//
+//            uart_read_index++;
+//        }
+//    }
+//
+//
+//    return  status;
+//}
+//
+//void button_init(void)
+//{
+//    BUTTON_DDR=0x00; //input
+//    BUTTON_PORT=0xFF;//pull_up
+//}
+
+void usart_init(void)
+{
+// USART initialization
+// Communication Parameters: 8 Data, 1 Stop, No Parity
+// USART Receiver: On
+// USART Transmitter: On
+// USART Mode: Asynchronous
+// USART Baud Rate: 9600
+UCSRA=(0<<RXC) | (0<<TXC) | (0<<UDRE) | (0<<FE) | (0<<DOR) | (0<<UPE) | (0<<U2X) | (0<<MPCM);
+UCSRB=(1<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (1<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
+UCSRC=(1<<URSEL) | (0<<UMSEL) | (0<<UPM1) | (0<<UPM0) | (0<<USBS) | (1<<UCSZ1) | (1<<UCSZ0) | (0<<UCPOL);
+UBRRH=0x00;
+UBRRL=0x33;
+}
+//void timer_init(void)
+//{
+//// Clock source: System Clock
+//// Clock value: 125.000 kHz
+//// Mode: Normal top=0xFFFF
+//// OC1A output: Disconnected
+//// OC1B output: Disconnected
+//// Noise Canceler: Off
+//// Input Capture on Falling Edge
+//// Timer Period: 0.1 s
+//// Timer1 Overflow Interrupt: On
+//// Input Capture Interrupt: Off
+//// Compare A Match Interrupt: Off
+//// Compare B Match Interrupt: Off
+//TCCR1A=(0<<COM1A1) | (0<<COM1A0) | (0<<COM1B1) | (0<<COM1B0) | (0<<WGM11) | (0<<WGM10);
+//TCCR1B=(0<<ICNC1) | (0<<ICES1) | (0<<WGM13) | (0<<WGM12) | (0<<CS12) | (1<<CS11) | (1<<CS10);
+//TCNT1H=0xCF;
+//TCNT1L=0x2C;
+//ICR1H=0x00;
+//ICR1L=0x00;
+//OCR1AH=0x00;
+//OCR1AL=0x00;
+//OCR1BH=0x00;
+//OCR1BL=0x00;
+//}
+
+// Standard Input/Output functions
+
+
+void main(void)
+{
+
+usart_init();
+//timer_init();
+
+// Global enable interrupts
+#asm("sei")
+
+      delay_ms(5000);
+      df_query(); 
+while (1)
+{   //BUYYON_PREES()
+           //WHICH_BUYYON()
+
+//        //if(~(BUTTON_PIN&(SHAME|SADNESS|SURPRISE|ANGER|HAPPINESS|FEAR)))
+//
+//            switch(~(BUTTON_PIN&(SHAME|SADNESS|SURPRISE|ANGER|HAPPINESS|FEAR)))
+//            {
+//                case(SHAME):
+//                     if(status == READY)
+//                    df_command(0x03,0x000X);
+//                    break;
+//                case(SADNESS):
+//                      if(status == READY)
+//                    df_command(0x03,0x000X);
+//                    break;
+////                case(SURPRISE):
+//                      if(status == READY)
+//                    df_command(0x03,0x000X);
+//                    break;
+//                case(ANGER)
+//                      if(status == READY)
+//                    df_command(0x03,0x000X);:
+//                    break;
+//                case(HAPPINESS):
+//                      if(status == READY)
+//                    df_command(0x03,0x000X);
+//                    break;
+//                case(FEAR):
+//if(status == READY)
+//                    df_command(0x03,0x000X);
+//                    break;
+//
+//
+//
+//            }
+//            while(~(BUTTON_PIN&(SHAME|SADNESS|SURPRISE|ANGER|HAPPINESS|FEAR)))
+//            {
+//            }
+//
+//
+//
+//
+//
+//
+//}
+}
+}

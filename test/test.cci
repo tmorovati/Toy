@@ -1,0 +1,5 @@
+VERSION:3 SOURCE_TIMESTAMP:530E39BC
+NODE:I LEVEL:0 LINE:24 "D:\My Programs\CodeVision\inc\mega32.h"
+NODE:I LEVEL:0 LINE:25 "D:\My Programs\CodeVision\inc\delay.h"
+NODE:I LEVEL:0 LINE:31 "D:\My Programs\CodeVision\inc\stdio.h"
+NODE:F LEVEL:0 LINE:35 "main(void)"

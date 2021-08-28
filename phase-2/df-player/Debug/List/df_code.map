@@ -1,0 +1,33 @@
+RAM Allocation [bytes]
+Variable                                                                          Address   Size
+------------------------------------------------------------------------------------------------
+uart_buffer                                                                       0x0260      32
+
+EEPROM Allocation [bytes]
+Variable                                                                          Address   Size
+------------------------------------------------------------------------------------------------
+
+Register Allocation
+Variable                                                                          Register  Size
+------------------------------------------------------------------------------------------------
+df_phase                                                                          R5           1
+query                                                                             R4           1
+param                                                                             R6,R7        2
+df_status                                                                         R9           1
+uart_write_index                                                                  R8           1
+uart_read_index                                                                   R11          1
+uart_status                                                                       R10          1
+
+FLASH Allocation [words]
+Function                                                                          Address   Size
+------------------------------------------------------------------------------------------------
+usart_rx_isr                                                                      0x00075     30
+button_init                                                                       0x00093      5
+usart_init                                                                        0x00098     11
+main                                                                              0x000A3     23
+putchar                                                                           0x000BA      7
+put_usart_G100                                                                    0x000C1     13
+_print_G100                                                                       0x000CE    308
+printf                                                                            0x00202     37
+strlen                                                                            0x00227     12
+strlenf                                                                           0x00233     13

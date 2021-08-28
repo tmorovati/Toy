@@ -36,7 +36,7 @@
 ; 0000 0008 
 ; 0000 0009      char i=0 ;
 ; 0000 000A      char send_command[10]= {START_BYTE, VERSION, LENGTH, 0, FEEDBACK, 0, 0, 0, 0, END_BYTE} ;
-; 0000 000B      int checksum = (0xFFFF - (VERSION + LENGTH + command + FEEDBACK + param )) ;
+; 0000 000B      int checksum = ((0xFFFF - (VERSION + LENGTH + command + FEEDBACK + param )) + 1 )  ;
 ; 0000 000C      send_command[3] =  command ;
 ;PCODE: $0000000F VOL: 0
 ;PCODE: $00000010 VOL: 0
@@ -63,27 +63,27 @@
 ;PCODE: $00000020 VOL: 0
 ;PCODE: $00000021 VOL: 0
 ;PCODE: $00000022 VOL: 0
-; 0000 000D      send_command[5] =  (( param >> 8 )& 0xFF )  ;
 ;PCODE: $00000023 VOL: 0
+; 0000 000D      send_command[5] =  (( param >> 8 )& 0xFF )  ;
 ;PCODE: $00000024 VOL: 0
 ;PCODE: $00000025 VOL: 0
 ;PCODE: $00000026 VOL: 0
-; 0000 000E      send_command[6] =  ( param &  0xFF );
 ;PCODE: $00000027 VOL: 0
+; 0000 000E      send_command[6] =  ( param &  0xFF );
 ;PCODE: $00000028 VOL: 0
 ;PCODE: $00000029 VOL: 0
-; 0000 000F      send_command[7] =  (( checksum >> 8 )& 0xFF )  ;
 ;PCODE: $0000002A VOL: 0
+; 0000 000F      send_command[7] =  (( checksum >> 8 )& 0xFF )  ;
 ;PCODE: $0000002B VOL: 0
 ;PCODE: $0000002C VOL: 0
 ;PCODE: $0000002D VOL: 0
-; 0000 0010      send_command[8] =  ( checksum &  0xFF );
 ;PCODE: $0000002E VOL: 0
+; 0000 0010      send_command[8] =  ( checksum &  0xFF );
 ;PCODE: $0000002F VOL: 0
 ;PCODE: $00000030 VOL: 0
+;PCODE: $00000031 VOL: 0
 ; 0000 0011 
 ; 0000 0012      for(i ; i < 10 ; i++ )
-;PCODE: $00000031 VOL: 0
 ;PCODE: $00000032 VOL: 0
 ;PCODE: $00000033 VOL: 0
 ;PCODE: $00000034 VOL: 0
@@ -91,8 +91,8 @@
 ;PCODE: $00000036 VOL: 0
 ;PCODE: $00000037 VOL: 0
 ;PCODE: $00000038 VOL: 0
-; 0000 0013          putchar(send_command[i]);
 ;PCODE: $00000039 VOL: 0
+; 0000 0013          putchar(send_command[i]);
 ;PCODE: $0000003A VOL: 0
 ;PCODE: $0000003B VOL: 0
 ;PCODE: $0000003C VOL: 0
@@ -103,59 +103,61 @@
 ;PCODE: $00000041 VOL: 0
 ;PCODE: $00000042 VOL: 0
 ;PCODE: $00000043 VOL: 0
-; 0000 0014 }
 ;PCODE: $00000044 VOL: 0
+; 0000 0014 }
 ;PCODE: $00000045 VOL: 0
 ;PCODE: $00000046 VOL: 0
 ;PCODE: $00000047 VOL: 0
-;//int take_query()
-;void main(void)
-; 0000 0017 {
 ;PCODE: $00000048 VOL: 0
-; 0000 0018 
-; 0000 0019 
-; 0000 001A // USART initialization
-; 0000 001B // Communication Parameters: 8 Data, 1 Stop, No Parity
-; 0000 001C // USART Receiver: Off
-; 0000 001D // USART Transmitter: On
-; 0000 001E // USART Mode: Asynchronous
-; 0000 001F // USART Baud Rate: 9600
-; 0000 0020 UCSRA=(0<<RXC) | (0<<TXC) | (0<<UDRE) | (0<<FE) | (0<<DOR) | (0<<UPE) | (0<<U2X) | (0<<MPCM);
+;//int take_query()
+;//{
+;//    char take_query[10]= {START_BYTE, VERSION, LENGTH, }
+;//}
+;void main(void)
+; 0000 001A {
 ;PCODE: $00000049 VOL: 0
+; 0000 001B 
+; 0000 001C 
+; 0000 001D // USART initialization
+; 0000 001E // Communication Parameters: 8 Data, 1 Stop, No Parity
+; 0000 001F // USART Receiver: Off
+; 0000 0020 // USART Transmitter: On
+; 0000 0021 // USART Mode: Asynchronous
+; 0000 0022 // USART Baud Rate: 9600
+; 0000 0023 UCSRA=(0<<RXC) | (0<<TXC) | (0<<UDRE) | (0<<FE) | (0<<DOR) | (0<<UPE) | (0<<U2X) | (0<<MPCM);
 ;PCODE: $0000004A VOL: 0
-; 0000 0021 UCSRB=(0<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (0<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
 ;PCODE: $0000004B VOL: 0
+; 0000 0024 UCSRB=(0<<RXCIE) | (0<<TXCIE) | (0<<UDRIE) | (0<<RXEN) | (1<<TXEN) | (0<<UCSZ2) | (0<<RXB8) | (0<<TXB8);
 ;PCODE: $0000004C VOL: 0
-; 0000 0022 UCSRC=(1<<URSEL) | (0<<UMSEL) | (0<<UPM1) | (0<<UPM0) | (0<<USBS) | (1<<UCSZ1) | (1<<UCSZ0) | (0<<UCPOL);
 ;PCODE: $0000004D VOL: 0
+; 0000 0025 UCSRC=(1<<URSEL) | (0<<UMSEL) | (0<<UPM1) | (0<<UPM0) | (0<<USBS) | (1<<UCSZ1) | (1<<UCSZ0) | (0<<UCPOL);
 ;PCODE: $0000004E VOL: 0
-; 0000 0023 UBRRH=0x00;
 ;PCODE: $0000004F VOL: 0
+; 0000 0026 UBRRH=0x00;
 ;PCODE: $00000050 VOL: 0
-; 0000 0024 UBRRL=0x33;
 ;PCODE: $00000051 VOL: 0
+; 0000 0027 UBRRL=0x33;
 ;PCODE: $00000052 VOL: 0
-; 0000 0025           delay_ms(5000);
 ;PCODE: $00000053 VOL: 0
+; 0000 0028           delay_ms(5000);
 ;PCODE: $00000054 VOL: 0
-; 0000 0026           send_command(0x03 , 0x0001);
 ;PCODE: $00000055 VOL: 0
+; 0000 0029           send_command(0x03 , 0x0001);
 ;PCODE: $00000056 VOL: 0
 ;PCODE: $00000057 VOL: 0
 ;PCODE: $00000058 VOL: 0
 ;PCODE: $00000059 VOL: 0
-; 0000 0027 
-; 0000 0028 
-; 0000 0029     while (1)
 ;PCODE: $0000005A VOL: 0
-; 0000 002A           {
+; 0000 002A 
 ; 0000 002B 
-; 0000 002C 
-; 0000 002D           }
+; 0000 002C     while (1)
 ;PCODE: $0000005B VOL: 0
+; 0000 002D           {
+; 0000 002E           }
 ;PCODE: $0000005C VOL: 0
-; 0000 002E 
-; 0000 002F }
 ;PCODE: $0000005D VOL: 0
+; 0000 002F 
+; 0000 0030 }
 ;PCODE: $0000005E VOL: 0
 ;PCODE: $0000005F VOL: 0
+;PCODE: $00000060 VOL: 0

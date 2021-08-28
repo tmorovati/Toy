@@ -13,6 +13,6 @@ Variable                                                                        
 FLASH Allocation [words]
 Function                                                                          Address   Size
 ------------------------------------------------------------------------------------------------
-send_command                                                                      0x00053     60
-main                                                                              0x0008F     21
-putchar                                                                           0x000A4      7
+send_command                                                                      0x00053     61
+main                                                                              0x00090     21
+putchar                                                                           0x000A5      7
