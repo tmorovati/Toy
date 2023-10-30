@@ -2,6 +2,11 @@
 
 Welcome to EmoSense, a cutting-edge toy designed and developed as part of a Bachelor Project. This innovative device is designed to foster emotional awareness and intelligence in users, with a particular focus on children.
 
+![image](https://github.com/tmorovati/Toy/assets/47552594/258af4a9-ce6f-4d54-aa0b-b07945ddc04a)
+
+![image](https://github.com/tmorovati/Toy/assets/47552594/cdca80eb-6f86-4125-86f9-2e3c72a7a505)
+
+
 ## Project Overview
 The primary objective of this project is to create an interactive toy equipped with six distinct buttons, each representing a specific emotion - happiness, sadness, embarrassment, and more. The underlying premise of this research is rooted in the belief that when individuals can formally recognize and label their emotions, they are better equipped to manage their feelings and make informed decisions.
 
