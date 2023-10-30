@@ -2,6 +2,9 @@
 
 Welcome to EmoSense, a cutting-edge toy designed and developed as part of a Bachelor Project. This innovative device is designed to foster emotional awareness and intelligence in users, with a particular focus on children.
 
+![image](https://github.com/tmorovati/Toy/assets/47552594/955eaf34-e919-4e86-bf02-062452622ad1)
+
+
 ![image](https://github.com/tmorovati/Toy/assets/47552594/258af4a9-ce6f-4d54-aa0b-b07945ddc04a)
 
 ![image](https://github.com/tmorovati/Toy/assets/47552594/cdca80eb-6f86-4125-86f9-2e3c72a7a505)
